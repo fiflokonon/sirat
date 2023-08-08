@@ -1,0 +1,77 @@
+<?php
+
+namespace App\Http\Controllers\Api\User;
+
+use App\Http\Controllers\Controller;
+use App\Models\Payment;
+use App\Models\User;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
+
+class PaymentController extends Controller
+{
+    public function recharge(string $identifiant, Request $request)
+    {
+        $user = User::where('unique_id', $identifiant)->first();
+
+        if (!$user) {
+            return response()->json(['success' => false, 'message' => 'Utilisateur indisponible'], 404);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'phone' => ['required', 'string', 'max:255'],
+            'amount' => ['required', 'integer']
+        ]);
+
+        if ($validator->fails()) {
+            $errorMessage = $validator->errors()->first();
+            return response()->json(['success' => false, 'message' => $errorMessage], 400);
+        }
+
+        $paymentRequest = $this->createPayplusInvoice($request);
+        #dd($paymentRequest['token']);
+        if (!$paymentRequest['success']) {
+            return response()->json(['success' => false, 'message' => 'La requête de paiement a échoué']);
+        }
+
+        $payment = Payment::create([
+            'user_id' => $user->id,
+            'phone' => $request->phone,
+            'amount' => $request->amount,
+            'token' => $paymentRequest['token'],
+            'status' => 'pending'
+        ]);
+        return response()->json($paymentRequest);
+    }
+
+    public function checking(Request $request)
+    {
+        $token = $request->token;
+        if ($token)
+        {
+            $payment = Payment::where('token', $token)->first();
+            if ($payment)
+            {
+                $checkingRequest = $this->fetchInvoiceStatus($token);
+                if ($checkingRequest['success'] && $checkingRequest['completed'])
+                {
+                    if ($payment->status != 'completed')
+                    {
+                        $user = $payment->user;
+                        $user->balance = $user->balance + $payment->amount;
+                        $user->save();
+                        $payment->status = 'completed';
+                        $payment->save();
+                        return response()->json(['success' => true, 'message' => "Recharge validée"]);
+                    }else{
+                        return response()->json(['success' => false, 'message' => 'Transaction dejà validée'], 400);
+                    }
+                }
+            }else{
+                return response()->json(['success' => false, 'message' => 'Paiement indisponible'], 404);
+            }
+        }else{
+            return response()->json(['success' => false, 'message' => 'Token requis']);
+        }
+    }
+}
