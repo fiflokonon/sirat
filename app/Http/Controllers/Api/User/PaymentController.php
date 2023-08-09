@@ -20,7 +20,7 @@ class PaymentController extends Controller
 
         $validator = Validator::make($request->all(), [
             'phone' => ['required', 'string', 'max:255'],
-            'amount' => ['required', 'integer']
+            'amount' => ['required', 'integer', 'min:100']
         ]);
 
         if ($validator->fails()) {
@@ -53,7 +53,7 @@ class PaymentController extends Controller
             if ($payment)
             {
                 $checkingRequest = $this->fetchInvoiceStatus($token);
-                if ($checkingRequest['success'] && $checkingRequest['completed'])
+                if ($checkingRequest['success'] && $checkingRequest['status'])
                 {
                     if ($payment->status != 'completed')
                     {

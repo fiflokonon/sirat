@@ -75,7 +75,7 @@ class UserController extends Controller
             $user = User::where('unique_id', $unique_id)->first();
             if ($user)
             {
-                if ($user->balance < 100)
+                if ($user->balance > 100)
                 {
                     $user->balance = $user->balance - 100;
                     Scan::create([
