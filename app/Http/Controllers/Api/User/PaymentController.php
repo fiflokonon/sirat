@@ -67,6 +67,9 @@ class PaymentController extends Controller
                         return response()->json(['success' => false, 'message' => 'Transaction dejà validée'], 400);
                     }
                 }
+                elseif ($checkingRequest['success'] && $checkingRequest['status'] == 'pending'){
+                    return response()->json(['success' => false, 'message' => 'Paiement en cours de validation', 'pending' => true]);
+                }
                 else{
                     return response()->json(['success' => false, 'message' => 'Paiement non validé']);
                 }
