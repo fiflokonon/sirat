@@ -53,7 +53,7 @@ class PaymentController extends Controller
             if ($payment)
             {
                 $checkingRequest = $this->fetchInvoiceStatus($token);
-                if ($checkingRequest['success'] && $checkingRequest['status'])
+                if ($checkingRequest['success'] && $checkingRequest['status'] == 'completed')
                 {
                     if ($payment->status != 'completed')
                     {
