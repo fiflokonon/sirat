@@ -62,10 +62,13 @@ class PaymentController extends Controller
                         $user->save();
                         $payment->status = 'completed';
                         $payment->save();
-                        return response()->json(['success' => true, 'message' => "Recharge validée"]);
+                        return response()->json(['success' => true, 'message' => "Recharge validée", 'response' => $payment->user]);
                     }else{
                         return response()->json(['success' => false, 'message' => 'Transaction dejà validée'], 400);
                     }
+                }
+                else{
+                    return response()->json(['success' => false, 'message' => 'Paiement non validé']);
                 }
             }else{
                 return response()->json(['success' => false, 'message' => 'Paiement indisponible'], 404);
