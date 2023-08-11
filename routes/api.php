@@ -26,8 +26,10 @@ Route::post('/users/{unique_id}/recharge', [PaymentController::class, 'recharge'
 Route::get('/users/{unique_id}', [UserController::class, 'infos']);
 Route::get('/users/{unique_id}/payments', [UserController::class, 'userPayments']);
 Route::post('/users/{unique_id}/scan', [UserController::class, 'scan'])->middleware('auth:sanctum');
+Route::post('/users/{unique_id}/new-scan', [UserController::class, 'newScan'])->middleware('auth:sanctum');
 Route::get('/agents/scans', [UserController::class, 'scans'])->middleware('auth:sanctum');
 Route::put('/payment-status', [PaymentController::class, 'checking']);
+Route::put('/new-payment-status', [PaymentController::class, 'newChecking'])->middleware('auth:sanctum');
 Route::post('/login', [AuthController::class, 'login']);
 
 Route::get('/callback', function () {
