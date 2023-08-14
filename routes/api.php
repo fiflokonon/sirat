@@ -25,6 +25,7 @@ Route::post('/init-user', [UserController::class, 'initUser']);
 Route::post('/users/{unique_id}/recharge', [PaymentController::class, 'recharge']);
 Route::get('/users/{unique_id}', [UserController::class, 'infos']);
 Route::get('/users/{unique_id}/payments', [UserController::class, 'userPayments']);
+Route::put('/users/{unique_id}/change-phone', [UserController::class, 'changePhone']);
 Route::post('/users/{unique_id}/scan', [UserController::class, 'scan'])->middleware('auth:sanctum');
 Route::post('/users/{unique_id}/new-scan', [UserController::class, 'newScan'])->middleware('auth:sanctum');
 Route::get('/agents/scans', [UserController::class, 'scans'])->middleware('auth:sanctum');

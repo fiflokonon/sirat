@@ -13,33 +13,7 @@ use StephaneAss\Payplus\Pay\PayPlus;
 
 class UserController extends Controller
 {
-    /*public function initUser(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'unique_id' => [
-                'required', 'string', 'max:255',
-                Rule::unique('users')->where(function ($query) use ($request) {
-                    return $query->where('unique_id', $request->unique_id)->where('id', '<>', $request->id);
-                }),
-            ],
-        ]);
 
-        if ($validator->fails()) {
-            $errors = $validator->errors();
-            $errorMessage = $errors->first();
-            return response()->json(['success' => false, 'message' => $errorMessage], 400);
-        }
-
-        try {
-            $user = User::create([
-                'unique_id' => $request->unique_id,
-            ]);
-            $user = User::where('unique_id', $request->unique_id)->get();
-            return response()->json(['success' => true, 'response' => $user]);
-        } catch (\Exception $exception) {
-            return response()->json(['success' => false, 'message' => $exception->getMessage()], 400);
-        }
-    }*/
     public function initUser(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -155,6 +129,38 @@ class UserController extends Controller
             }
         }
     }
+
+    public function changePhone(string $unique_id, Request $request)
+    {
+        $validator = Validator::make(['unique_id' => $unique_id], [
+            'unique_id' => [
+                'required', 'string', 'max:255',
+                Rule::exists('users', 'unique_id'),
+            ],
+        ]);
+
+        if ($validator->fails()) {
+            $errors = $validator->errors();
+            $errorMessage = $errors->first();
+            return response()->json(['success' => false, 'message' => $errorMessage], 400);
+        }
+
+        try {
+            $user = User::where('unique_id', $unique_id)->first();
+
+            if (!$user) {
+                return response()->json(['success' => false, 'message' => 'Utilisateur non trouvé'], 404);
+            }
+
+            $user->phone = $request->phone;
+            $user->save();
+
+            return response()->json(['success' => true, 'message' => 'Numéro de téléphone mis à jour avec succès']);
+        } catch (\Exception $exception) {
+            return response()->json(['success' => false, 'message' => $exception->getMessage()], 400);
+        }
+    }
+
 
     public function lauchPayment(string $phone)
     {
