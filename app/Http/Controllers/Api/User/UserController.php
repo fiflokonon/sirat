@@ -155,7 +155,7 @@ class UserController extends Controller
             $user->phone = $request->phone;
             $user->save();
 
-            return response()->json(['success' => true, 'message' => 'Numéro de téléphone mis à jour avec succès']);
+            return response()->json(['success' => true, 'message' => 'Numéro de téléphone mis à jour avec succès', 'user' => $user]);
         } catch (\Exception $exception) {
             return response()->json(['success' => false, 'message' => $exception->getMessage()], 400);
         }
